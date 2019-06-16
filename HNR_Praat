@@ -1,0 +1,56 @@
+clearinfo
+
+# use given directory NOTE: needs to be manually set (Praat is dumb :P)
+directory$ = "C:\Users\Tom\Desktop\HNR"
+
+Create Strings as file list... list 'directory$'/*.wav
+
+myList = Create Strings as file list... list 'directory$'/*.wav
+
+numberOfFiles = Get number of strings
+for ifile to numberOfFiles
+
+select Strings list
+select myList
+
+fileName$ = Get string... ifile
+
+Read from file... 'directory$'/'fileName$'
+mySound = Read from file... 'directory$'/'fileName$'
+# n.b. again, we are using a manually set directory; see line 4
+
+n = numberOfSelected ("Sound")
+for i to n
+sound'i' = selected ("Sound", i)
+endfor
+
+# select all sounds
+for i to n
+select sound'i'
+
+To Harmonicity (cc)... 0.01 75 0.1 1
+
+Get mean... 0 0
+# make variable
+mean_harmonicity = Get mean... 0 0
+# print this with other relevant strings (Praat file ID + actual filename), note HNR is to 3 decimals (can change this if we want)
+printline 'ifile''tab$''fileName$''tab$''mean_harmonicity:3'
+
+# then write to file (with filenames and Praat ID numbers)
+fileappend HNR-results.txt 'ifile''tab$''fileName$''tab$''mean_harmonicity:3''newline$'
+# then write another file with only the HNRs
+fileappend HNR-results-strings.txt 'mean_harmonicity:3''newline$'
+
+# clean up
+endfor
+if n >= 1
+select sound1
+for i from 2 to n
+plus sound'i'
+endfor
+endif
+plus mySound
+Remove
+endfor
+select myList
+Remove
